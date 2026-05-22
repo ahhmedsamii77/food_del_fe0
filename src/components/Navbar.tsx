@@ -83,18 +83,19 @@ export default function Navbar() {
               </Button>
             )}
 
-            {/* User menu / Login */}
             {access_Token && user ? (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
-                        {user.name?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
+                      <Avatar className="h-9 w-9">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                          {user.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  }
+                />
                 <DropdownMenuContent align="end" className="w-52">
                   <div className="px-3 py-2">
                     <p className="text-sm font-semibold">{user.name}</p>

@@ -11,7 +11,7 @@ import { KeyRound } from "lucide-react";
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
   const { mutate: sendOtp, isPending } = useForgotPassword();
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<{ email: string }>();
+  const { register, handleSubmit, formState: { errors } } = useForm<{ email: string }>();
 
   const onSubmit = (data: { email: string }) => {
     sendOtp(data, {

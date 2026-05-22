@@ -10,7 +10,7 @@ export default function VerifyPage() {
   const navigate = useNavigate();
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
-  const { mutate: verifyOrder, isPending, isSuccess, isError } = useVerifyOrder();
+  const { mutate: verifyOrder, isPending } = useVerifyOrder();
 
   useEffect(() => {
     if (orderId && success !== null) {
