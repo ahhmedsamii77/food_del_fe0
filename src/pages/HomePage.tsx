@@ -30,7 +30,7 @@ export default function HomePage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Hero */}
-      <section className="relative rounded-3xl overflow-hidden mb-10 bg-linear-to-br from-primary/90 to-indigo-600 p-8 md:p-12 text-white">
+      <section className="relative rounded-3xl overflow-hidden mb-10 bg-linear-to-br from-primary/90 to-orange-600 p-8 md:p-12 text-white">
         <div className="relative z-10 max-w-xl">
           <p className="text-primary-foreground/80 text-sm font-medium mb-2 tracking-wide uppercase">
             Fast & Fresh Delivery
