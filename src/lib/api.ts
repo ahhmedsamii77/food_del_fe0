@@ -2,9 +2,19 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useAuthStore } from "@/lib/store/auth";
 
-const baseURL = import.meta.env.VITE_API_BASE_URL 
+function sanitizeUrl(url: string): string {
+  if (!url) return "";
+  if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/")) {
+    return `https://${url}`;
+  }
+  return url;
+}
 
-export const api = axios.create({ baseURL: `${import.meta.env.VITE_API_BASE_URL}/api` });
+const rawBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+export const baseDomain = sanitizeUrl(rawBase.replace(/\/api$/, ""));
+export const baseURL = `${baseDomain}/api`;
+
+export const api = axios.create({ baseURL });
 
 let refreshPromise: Promise<string> | null = null;
 
