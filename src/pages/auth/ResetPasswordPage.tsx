@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useVerifyResetOtp, useResetPassword } from "@/lib/hooks";
+import { verifyResetPasswordSchema, resetPasswordSchema } from "@/lib/validations/auth";
 import { toast } from "sonner";
 import { ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { z } from "zod";
+
+type VerifyOtpFormData = z.infer<typeof verifyResetPasswordSchema>;
+type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -20,12 +26,24 @@ export default function ResetPasswordPage() {
   const { mutate: verifyOtp, isPending: isVerifying } = useVerifyResetOtp();
   const { mutate: reset, isPending: isResetting } = useResetPassword();
 
-  const otpForm = useForm<{ email: string; otp: string }>({
-    defaultValues: { email: defaultEmail },
+  const otpForm = useForm<VerifyOtpFormData>({
+    resolver: zodResolver(verifyResetPasswordSchema),
+    defaultValues: { email: defaultEmail, otp: "" },
   });
-  const passForm = useForm<{ password: string; confirmPassword: string }>();
 
-  const onVerifyOtp = (data: { email: string; otp: string }) => {
+  const passForm = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { email: defaultEmail, password: "", confirmPassword: "" },
+  });
+
+  // Sync verified email when OTP step finishes successfully
+  useEffect(() => {
+    if (verifiedEmail) {
+      passForm.setValue("email", verifiedEmail);
+    }
+  }, [verifiedEmail, passForm]);
+
+  const onVerifyOtp = (data: VerifyOtpFormData) => {
     setVerifiedEmail(data.email);
     verifyOtp(data, {
       onSuccess: () => {
@@ -37,13 +55,10 @@ export default function ResetPasswordPage() {
     });
   };
 
-  const onResetPassword = (data: {
-    password: string;
-    confirmPassword: string;
-  }) => {
+  const onResetPassword = (data: ResetPasswordFormData) => {
     reset(
       {
-        email: verifiedEmail,
+        email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
       },
@@ -86,27 +101,32 @@ export default function ResetPasswordPage() {
               className="space-y-5"
             >
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Email address</Label>
+                <Label htmlFor="reset-email" className="text-sm font-medium">Email address</Label>
                 <Input
                   id="reset-email"
                   type="email"
-                  className="h-11 rounded-xl"
-                  {...otpForm.register("email", { required: true })}
+                  className={`h-11 rounded-xl ${otpForm.formState.errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  {...otpForm.register("email")}
                 />
+                {otpForm.formState.errors.email && (
+                  <p className="text-xs text-destructive">{otpForm.formState.errors.email.message}</p>
+                )}
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">OTP Code</Label>
+                <Label htmlFor="reset-otp" className="text-sm font-medium">OTP Code</Label>
                 <Input
                   id="reset-otp"
                   placeholder="123456"
                   maxLength={6}
-                  className="h-14 rounded-xl text-center text-3xl tracking-[0.6em] font-mono"
-                  {...otpForm.register("otp", {
-                    required: true,
-                    minLength: 6,
-                  })}
+                  className={`h-14 rounded-xl text-center text-3xl tracking-[0.6em] font-mono ${
+                    otpForm.formState.errors.otp ? "border-destructive focus-visible:ring-destructive" : ""
+                  }`}
+                  {...otpForm.register("otp")}
                 />
+                {otpForm.formState.errors.otp && (
+                  <p className="text-xs text-destructive">{otpForm.formState.errors.otp.message}</p>
+                )}
               </div>
 
               <Button
@@ -124,18 +144,22 @@ export default function ResetPasswordPage() {
               onSubmit={passForm.handleSubmit(onResetPassword)}
               className="space-y-5"
             >
+              {/* Hidden Email Field to satisfy resetPasswordSchema */}
+              <input type="hidden" {...passForm.register("email")} />
+
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">New Password</Label>
+                <Label htmlFor="new-password" className="text-sm font-medium">New Password</Label>
                 <div className="relative">
                   <Input
                     id="new-password"
                     type={showPw ? "text" : "password"}
                     placeholder="Min 8 characters"
-                    className="h-11 rounded-xl pr-11"
-                    {...passForm.register("password", {
-                      required: true,
-                      minLength: 8,
-                    })}
+                    className={`h-11 rounded-xl pr-11 ${
+                      passForm.formState.errors.password
+                        ? "border-destructive focus-visible:ring-destructive"
+                        : ""
+                    }`}
+                    {...passForm.register("password")}
                   />
                   <button
                     type="button"
@@ -149,10 +173,15 @@ export default function ResetPasswordPage() {
                     )}
                   </button>
                 </div>
+                {passForm.formState.errors.password && (
+                  <p className="text-xs text-destructive">
+                    {passForm.formState.errors.password.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">
+                <Label htmlFor="confirm-new-password" className="text-sm font-medium">
                   Confirm New Password
                 </Label>
                 <div className="relative">
@@ -162,15 +191,10 @@ export default function ResetPasswordPage() {
                     placeholder="Repeat password"
                     className={`h-11 rounded-xl pr-11 ${
                       passForm.formState.errors.confirmPassword
-                        ? "border-destructive"
+                        ? "border-destructive focus-visible:ring-destructive"
                         : ""
                     }`}
-                    {...passForm.register("confirmPassword", {
-                      required: true,
-                      validate: (v) =>
-                        v === passForm.watch("password") ||
-                        "Passwords don't match",
-                    })}
+                    {...passForm.register("confirmPassword")}
                   />
                   <button
                     type="button"

@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useConfirmEmail, useResendOtp } from "@/lib/hooks";
+import { confirmEmailSchema } from "@/lib/validations/auth";
 import { toast } from "sonner";
 import { Mail, ArrowLeft } from "lucide-react";
+import { z } from "zod";
+
+type ConfirmEmailFormData = z.infer<typeof confirmEmailSchema>;
 
 export default function ConfirmEmailPage() {
   const navigate = useNavigate();
@@ -20,11 +25,12 @@ export default function ConfirmEmailPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ email: string; otp: string }>({
-    defaultValues: { email: defaultEmail },
+  } = useForm<ConfirmEmailFormData>({
+    resolver: zodResolver(confirmEmailSchema),
+    defaultValues: { email: defaultEmail, otp: "" },
   });
 
-  const onSubmit = (data: { email: string; otp: string }) => {
+  const onSubmit = (data: ConfirmEmailFormData) => {
     setEmail(data.email);
     confirm(data, {
       onSuccess: () => {
@@ -74,8 +80,8 @@ export default function ConfirmEmailPage() {
               <Input
                 id="email"
                 type="email"
-                className={`h-11 rounded-xl ${errors.email ? "border-destructive" : ""}`}
-                {...register("email", { required: "Email is required" })}
+                className={`h-11 rounded-xl ${errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                {...register("email")}
                 onChange={(e) => setEmail(e.target.value)}
               />
               {errors.email && (
@@ -93,12 +99,9 @@ export default function ConfirmEmailPage() {
                 placeholder="123456"
                 maxLength={6}
                 className={`h-14 rounded-xl text-center text-3xl tracking-[0.6em] font-mono ${
-                  errors.otp ? "border-destructive" : ""
+                  errors.otp ? "border-destructive focus-visible:ring-destructive" : ""
                 }`}
-                {...register("otp", {
-                  required: "OTP is required",
-                  minLength: { value: 6, message: "OTP must be 6 digits" },
-                })}
+                {...register("otp")}
               />
               {errors.otp && (
                 <p className="text-xs text-destructive">{errors.otp.message}</p>

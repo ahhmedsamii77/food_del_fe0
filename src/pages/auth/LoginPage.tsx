@@ -1,27 +1,38 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLogin } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/store/auth";
 import { toast } from "sonner";
-import type { LoginForm } from "@/types";
+import { loginSchema } from "@/lib/validations/auth";
 import { UtensilsCrossed, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { z } from "zod";
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { setAccess_Token, setRefresh_Token, setRole } = useAuthStore();
   const { mutate: login, isPending } = useLogin();
   const [showPw, setShowPw] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>();
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const onSubmit = (data: LoginForm) => {
+  const onSubmit = (data: LoginFormData) => {
     login(data, {
       onSuccess: (res) => {
         const { credentials, role } = res.data.data;
@@ -78,8 +89,8 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className={`h-11 rounded-xl ${errors.email ? "border-destructive" : ""}`}
-                {...register("email", { required: "Email is required" })}
+                className={`h-11 rounded-xl ${errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                {...register("email")}
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email.message}</p>
@@ -104,11 +115,8 @@ export default function LoginPage() {
                   id="password"
                   type={showPw ? "text" : "password"}
                   placeholder="••••••••"
-                  className={`h-11 rounded-xl pr-11 ${errors.password ? "border-destructive" : ""}`}
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: { value: 8, message: "Minimum 8 characters" },
-                  })}
+                  className={`h-11 rounded-xl pr-11 ${errors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  {...register("password")}
                 />
                 <button
                   type="button"

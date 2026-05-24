@@ -1,11 +1,16 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForgotPassword } from "@/lib/hooks";
+import { sendResetPasswordOtpSchema } from "@/lib/validations/auth";
 import { toast } from "sonner";
 import { KeyRound, ArrowLeft } from "lucide-react";
+import { z } from "zod";
+
+type ForgotPasswordFormData = z.infer<typeof sendResetPasswordOtpSchema>;
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -14,9 +19,12 @@ export default function ForgotPasswordPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ email: string }>();
+  } = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(sendResetPasswordOtpSchema),
+    defaultValues: { email: "" },
+  });
 
-  const onSubmit = (data: { email: string }) => {
+  const onSubmit = (data: ForgotPasswordFormData) => {
     sendOtp(data, {
       onSuccess: () => {
         toast.success("Reset OTP sent to your email 📧");
@@ -53,8 +61,8 @@ export default function ForgotPasswordPage() {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className={`h-11 rounded-xl ${errors.email ? "border-destructive" : ""}`}
-                {...register("email", { required: "Email is required" })}
+                className={`h-11 rounded-xl ${errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                {...register("email")}
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email.message}</p>
