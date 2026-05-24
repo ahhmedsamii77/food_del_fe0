@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, Minus, ShoppingCart, ArrowRight } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Minus,
+  ShoppingCart,
+  ArrowRight,
+  MapPin,
+  ReceiptText,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +20,23 @@ import { toast } from "sonner";
 import type { DeliveryAddress } from "@/types";
 
 const DELIVERY_FEE = 50;
+
+const ADDRESS_FIELDS: {
+  key: keyof DeliveryAddress;
+  label: string;
+  type: string;
+  span?: boolean;
+}[] = [
+  { key: "firstName",  label: "First Name",      type: "text" },
+  { key: "lastName",   label: "Last Name",        type: "text" },
+  { key: "email",      label: "Email",            type: "email" },
+  { key: "phone",      label: "Phone",            type: "tel" },
+  { key: "street",     label: "Street Address",   type: "text", span: true },
+  { key: "city",       label: "City",             type: "text" },
+  { key: "state",      label: "State / Province", type: "text" },
+  { key: "zipCode",    label: "ZIP Code",         type: "text" },
+  { key: "country",    label: "Country",          type: "text" },
+];
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -25,162 +49,236 @@ export default function CartPage() {
     city: "", state: "", zipCode: "", country: "", phone: "",
   });
 
-  const subtotal = cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) ?? 0;
+  const subtotal =
+    cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) ?? 0;
   const total = subtotal + DELIVERY_FEE;
 
   const handleQty = (itemId: string, qty: number) => {
-    updateQty({ itemId, quantity: qty }, {
-      onError: () => toast.error("Failed to update quantity"),
-    });
+    updateQty(
+      { itemId, quantity: qty },
+      { onError: () => toast.error("Failed to update quantity") },
+    );
   };
 
   const handleCheckout = () => {
     if (!cartItems?.length) return toast.error("Your cart is empty");
-    const required = ["firstName", "lastName", "email", "street", "city", "phone"] as const;
+    const required: (keyof DeliveryAddress)[] = [
+      "firstName", "lastName", "email", "street", "city", "phone",
+    ];
     for (const key of required) {
-      if (!address[key]) return toast.error(`Please fill in ${key}`);
+      if (!address[key])
+        return toast.error(`Please fill in "${key}"`);
     }
     placeOrder(
       { items: cartItems, amount: total, address },
       {
         onSuccess: (res) => {
-          if (res.data.success && res.data.session_url) {
+          if (res.data.success && res.data.session_url)
             window.location.href = res.data.session_url;
-          }
         },
-        onError: (err: any) => toast.error(err?.response?.data?.message || "Order failed"),
+        onError: (err: any) =>
+          toast.error(err?.response?.data?.message || "Order failed"),
       },
     );
   };
 
+  /* ── Loading ── */
   if (isLoading) {
     return (
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <Skeleton className="h-8 w-40 mb-8" />
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)}
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-28 w-full rounded-2xl" />
+            ))}
           </div>
-          <Skeleton className="h-80 rounded-xl" />
+          <Skeleton className="h-80 rounded-2xl" />
         </div>
       </main>
     );
   }
 
+  /* ── Empty ── */
   if (!cartItems?.length) {
     return (
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <ShoppingCart className="h-20 w-20 text-muted-foreground/20 mb-4" />
+      <main className="max-w-6xl mx-auto px-4 py-10">
+        <div className="flex flex-col items-center justify-center py-36 text-center">
+          <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
+            <ShoppingCart className="h-10 w-10 text-muted-foreground/40" />
+          </div>
           <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">Add some delicious items to get started</p>
-          <Button onClick={() => navigate("/")}>Browse Menu</Button>
+          <p className="text-muted-foreground mb-7">
+            Add some delicious items to get started
+          </p>
+          <Button
+            id="browse-menu-btn"
+            onClick={() => navigate("/")}
+            className="rounded-xl px-7"
+          >
+            Browse Menu
+          </Button>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+        <ShoppingCart className="h-7 w-7 text-primary" />
+        Your Cart
+        <span className="ml-1 text-lg text-muted-foreground font-normal">
+          ({cartItems.length} item{cartItems.length > 1 ? "s" : ""})
+        </span>
+      </h1>
+
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Cart items */}
+        {/* ── Left column ── */}
         <div className="lg:col-span-2 space-y-4">
+
+          {/* Cart item rows */}
           {cartItems.map((item) => (
-            <Card key={item._id} className="overflow-hidden border-border/50 animate-fade-in">
-              <CardContent className="p-4 flex gap-4">
-                <div className="h-20 w-20 rounded-lg overflow-hidden shrink-0 bg-muted">
-                  <img
-                    src={getFoodImageUrl(item.image)}
-                    alt={item.name}
-                    className="h-full w-full object-cover"
-                    onError={(e) => (e.currentTarget.style.display = "none")}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold truncate">{item.name}</h3>
-                  <p className="text-primary font-bold mt-1">{item.price} EGP</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    Subtotal: <span className="font-medium text-foreground">{item.price * item.quantity} EGP</span>
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-full"
-                    onClick={() => handleQty(item._id, item.quantity - 1)}>
-                    <Minus className="h-3.5 w-3.5" />
-                  </Button>
-                  <span className="font-semibold w-6 text-center">{item.quantity}</span>
-                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-full"
-                    onClick={() => handleQty(item._id, item.quantity + 1)}>
-                    <Plus className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => handleQty(item._id, 0)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div
+              key={item._id}
+              className="flex gap-4 items-center rounded-2xl border border-border/50 bg-card p-4 shadow-sm animate-fade-in"
+            >
+              {/* Thumb */}
+              <div className="h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-muted">
+                <img
+                  src={getFoodImageUrl(item.image)}
+                  alt={item.name}
+                  className="h-full w-full object-cover"
+                  onError={(e) => (e.currentTarget.style.display = "none")}
+                />
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold truncate text-[15px]">{item.name}</p>
+                <p className="text-primary font-bold mt-0.5">{item.price} EGP</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Subtotal:{" "}
+                  <span className="text-foreground font-medium">
+                    {item.price * item.quantity} EGP
+                  </span>
+                </p>
+              </div>
+
+              {/* Controls */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Button
+                  id={`cart-dec-${item._id}`}
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-xl border-border"
+                  onClick={() => handleQty(item._id, item.quantity - 1)}
+                >
+                  <Minus className="h-3.5 w-3.5" />
+                </Button>
+                <span className="font-bold w-6 text-center tabular-nums text-sm">
+                  {item.quantity}
+                </span>
+                <Button
+                  id={`cart-inc-${item._id}`}
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-xl border-border"
+                  onClick={() => handleQty(item._id, item.quantity + 1)}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  id={`cart-del-${item._id}`}
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-xl text-destructive hover:bg-destructive/8 ml-1"
+                  onClick={() => handleQty(item._id, 0)}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
           ))}
 
-          {/* Delivery Address */}
-          <Card className="border-border/50">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Delivery Address</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { key: "firstName", label: "First Name", type: "text" },
-                { key: "lastName", label: "Last Name", type: "text" },
-                { key: "email", label: "Email", type: "email" },
-                { key: "phone", label: "Phone", type: "tel" },
-                { key: "street", label: "Street Address", type: "text" },
-                { key: "city", label: "City", type: "text" },
-                { key: "state", label: "State", type: "text" },
-                { key: "zipCode", label: "ZIP Code", type: "text" },
-                { key: "country", label: "Country", type: "text" },
-              ].map(({ key, label, type }) => (
-                <div key={key} className={key === "street" ? "sm:col-span-2" : ""}>
-                  <Label htmlFor={key} className="text-sm">{label}</Label>
+          {/* Delivery address */}
+          <div className="rounded-2xl border border-border/50 bg-card shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+              <MapPin className="h-4 w-4 text-primary" />
+              <h2 className="font-semibold text-base">Delivery Address</h2>
+            </div>
+            <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {ADDRESS_FIELDS.map(({ key, label, type, span }) => (
+                <div key={key} className={span ? "sm:col-span-2" : ""}>
+                  <Label
+                    htmlFor={`addr-${key}`}
+                    className="text-xs font-medium text-muted-foreground mb-1.5 block"
+                  >
+                    {label}
+                  </Label>
                   <Input
-                    id={key}
+                    id={`addr-${key}`}
                     type={type}
-                    className="mt-1"
-                    value={address[key as keyof DeliveryAddress]}
-                    onChange={(e) => setAddress((prev) => ({ ...prev, [key]: e.target.value }))}
+                    className="h-10 rounded-xl"
+                    value={address[key]}
+                    onChange={(e) =>
+                      setAddress((prev) => ({ ...prev, [key]: e.target.value }))
+                    }
                   />
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Order summary */}
+        {/* ── Order summary ── */}
         <div>
-          <Card className="sticky top-24 border-border/50">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="sticky top-24 rounded-2xl border border-border/50 bg-card shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+              <ReceiptText className="h-4 w-4 text-primary" />
+              <h2 className="font-semibold text-base">Order Summary</h2>
+            </div>
+
+            <div className="p-5 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">
+                  Subtotal ({cartItems.length} items)
+                </span>
                 <span className="font-medium">{subtotal} EGP</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Delivery Fee</span>
+                <span className="text-muted-foreground">Delivery fee</span>
                 <span className="font-medium">{DELIVERY_FEE} EGP</span>
               </div>
-              <Separator />
+              <Separator className="my-1" />
               <div className="flex justify-between font-bold text-base">
                 <span>Total</span>
-                <span className="text-primary">{total} EGP</span>
+                <span className="text-primary text-lg">{total} EGP</span>
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full gap-2" size="lg" onClick={handleCheckout} disabled={isOrdering}>
-                {isOrdering ? "Processing..." : (<>Proceed to Payment <ArrowRight className="h-4 w-4" /></>)}
+            </div>
+
+            <div className="px-5 pb-5">
+              <Button
+                id="checkout-btn"
+                className="w-full rounded-xl gap-2 h-12 text-base shadow-md shadow-primary/25 hover:shadow-lg hover:shadow-primary/35"
+                size="lg"
+                onClick={handleCheckout}
+                disabled={isOrdering}
+              >
+                {isOrdering ? (
+                  "Processing…"
+                ) : (
+                  <>
+                    Proceed to Payment
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </Button>
-            </CardFooter>
-          </Card>
+              <p className="text-center text-xs text-muted-foreground mt-3">
+                🔒 Secure checkout via Stripe
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </main>
