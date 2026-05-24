@@ -29,7 +29,11 @@ export default function LoginPage() {
         setRefresh_Token(credentials.refresh_token);
         setRole(role);
         toast.success("Welcome back! 🍕");
-        navigate("/");
+        if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       },
       onError: (err: any) => {
         const msg = err?.response?.data?.message || "Login failed";

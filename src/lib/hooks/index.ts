@@ -15,11 +15,7 @@ import {
   getMe,
   logout,
 } from "@/lib/api/user.api";
-import {
-  listFood,
-  addFood,
-  removeFood,
-} from "@/lib/api/food.api";
+import { listFood, addFood, removeFood } from "@/lib/api/food.api";
 import {
   addToCart,
   removeFromCart,
@@ -30,6 +26,8 @@ import {
   placeOrder,
   verifyOrder,
   getUserOrders,
+  adminGetAllOrders,
+  adminUpdateOrderStatus,
 } from "@/lib/api/order.api";
 import { useAuthStore } from "@/lib/store/auth";
 import type {
@@ -42,18 +40,14 @@ import type {
   DeliveryAddress,
 } from "@/types";
 
-// ── Auth hooks ────────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────────────
 
 export function useRegister() {
-  return useMutation({
-    mutationFn: (data: RegisterForm) => register(data),
-  });
+  return useMutation({ mutationFn: (data: RegisterForm) => register(data) });
 }
 
 export function useLogin() {
-  return useMutation({
-    mutationFn: (data: LoginForm) => login(data),
-  });
+  return useMutation({ mutationFn: (data: LoginForm) => login(data) });
 }
 
 export function useConfirmEmail() {
@@ -113,7 +107,7 @@ export function useLogout() {
   });
 }
 
-// ── Food hooks ────────────────────────────────────────────────────────────────
+// ── Food ──────────────────────────────────────────────────────────────────────
 
 export function useGetFoods(): UseQueryResult<FoodItem[]> {
   return useQuery({
@@ -128,9 +122,7 @@ export function useAddFood() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: FormData) => addFood(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["foods"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["foods"] }),
   });
 }
 
@@ -138,13 +130,11 @@ export function useRemoveFood() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => removeFood(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["foods"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["foods"] }),
   });
 }
 
-// ── Cart hooks ────────────────────────────────────────────────────────────────
+// ── Cart ──────────────────────────────────────────────────────────────────────
 
 export function useGetCart(): UseQueryResult<CartItem[]> {
   const { access_Token } = useAuthStore();
@@ -161,9 +151,7 @@ export function useAddToCart() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (itemId: string) => addToCart(itemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 }
 
@@ -171,9 +159,7 @@ export function useRemoveFromCart() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (itemId: string) => removeFromCart(itemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 }
 
@@ -182,13 +168,11 @@ export function useUpdateCartQuantity() {
   return useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
       updateCartQuantity(itemId, quantity),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 }
 
-// ── Order hooks ───────────────────────────────────────────────────────────────
+// ── Orders ────────────────────────────────────────────────────────────────────
 
 export function usePlaceOrder() {
   const queryClient = useQueryClient();
@@ -198,20 +182,15 @@ export function usePlaceOrder() {
       amount: number;
       address: DeliveryAddress;
     }) => placeOrder(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 }
 
 export function useVerifyOrder() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { orderId: string; success: string }) =>
-      verifyOrder(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-    },
+    mutationFn: (data: { orderId: string; success: string }) => verifyOrder(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["orders"] }),
   });
 }
 
@@ -222,5 +201,28 @@ export function useGetUserOrders(): UseQueryResult<Order[]> {
     queryFn: ({ signal }) => getUserOrders(signal),
     select: (data) => data.data.data as Order[],
     enabled: !!access_Token,
+  });
+}
+
+// ── Admin ─────────────────────────────────────────────────────────────────────
+
+export function useAdminGetAllOrders(): UseQueryResult<Order[]> {
+  const { access_Token } = useAuthStore();
+  return useQuery({
+    queryKey: ["admin-orders"],
+    queryFn: ({ signal }) => adminGetAllOrders(signal),
+    select: (data) => data.data.data as Order[],
+    enabled: !!access_Token,
+    refetchInterval: 30_000,
+  });
+}
+
+export function useAdminUpdateOrderStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { orderId: string; status: string }) =>
+      adminUpdateOrderStatus(data),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] }),
   });
 }

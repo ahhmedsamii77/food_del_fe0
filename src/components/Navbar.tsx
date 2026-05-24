@@ -24,7 +24,7 @@ import { useState } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { access_Token } = useAuthStore();
+  const { access_Token, role } = useAuthStore();
   const { data: user } = useGetMe();
   const { data: cartItems } = useGetCart();
   const { mutate: logoutMutate, isPending: isLoggingOut } = useLogout();
@@ -71,7 +71,7 @@ export default function Navbar() {
               >
                 Menu
               </Link>
-              {access_Token && (
+              {access_Token && role !== "admin" && (
                 <Link
                   to="/orders"
                   className="relative px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
@@ -79,12 +79,20 @@ export default function Navbar() {
                   My Orders
                 </Link>
               )}
+              {access_Token && role === "admin" && (
+                <Link
+                  to="/admin"
+                  className="relative px-3 py-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors rounded-lg hover:bg-primary/5"
+                >
+                  Admin Panel
+                </Link>
+              )}
             </nav>
 
             {/* ── Right actions ── */}
             <div className="flex items-center gap-2">
               {/* Cart */}
-              {access_Token && (
+              {access_Token && role !== "admin" && (
                 <Button
                   id="nav-cart-btn"
                   variant="ghost"
@@ -127,20 +135,33 @@ export default function Navbar() {
                         {user.email}
                       </p>
                     </div>
-                    <DropdownMenuItem
-                      id="nav-orders-link"
-                      onClick={() => navigate("/orders")}
-                    >
-                      <ClipboardList className="mr-2 h-4 w-4" />
-                      My Orders
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      id="nav-cart-link"
-                      onClick={() => navigate("/cart")}
-                    >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Cart{cartCount > 0 && ` (${cartCount})`}
-                    </DropdownMenuItem>
+                    {role === "admin" ? (
+                      <DropdownMenuItem
+                        id="nav-admin-link"
+                        onClick={() => navigate("/admin")}
+                        className="font-semibold text-primary focus:text-primary focus:bg-primary/10"
+                      >
+                        <UtensilsCrossed className="mr-2 h-4 w-4" />
+                        Admin Panel
+                      </DropdownMenuItem>
+                    ) : (
+                      <>
+                        <DropdownMenuItem
+                          id="nav-orders-link"
+                          onClick={() => navigate("/orders")}
+                        >
+                          <ClipboardList className="mr-2 h-4 w-4" />
+                          My Orders
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          id="nav-cart-link"
+                          onClick={() => navigate("/cart")}
+                        >
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Cart{cartCount > 0 && ` (${cartCount})`}
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       id="nav-logout-btn"
@@ -195,13 +216,22 @@ export default function Navbar() {
             >
               Menu
             </Link>
-            {access_Token && (
+            {access_Token && role !== "admin" && (
               <Link
                 to="/orders"
                 className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 My Orders
+              </Link>
+            )}
+            {access_Token && role === "admin" && (
+              <Link
+                to="/admin"
+                className="px-3 py-2.5 text-sm font-semibold rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                Admin Panel
               </Link>
             )}
             {!access_Token && (

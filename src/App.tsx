@@ -11,9 +11,21 @@ import OrdersPage from "@/pages/OrdersPage";
 import VerifyPage from "@/pages/VerifyPage";
 import Navbar from "@/components/Navbar";
 
+// Admin pages
+import AdminLayout from "@/pages/admin/AdminLayout";
+import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
+import AdminFoodsPage from "@/pages/admin/AdminFoodsPage";
+import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { access_Token } = useAuthStore();
   if (!access_Token) return <Navigate to="/auth/login" replace />;
+  return <>{children}</>;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { access_Token, role } = useAuthStore();
+  if (!access_Token || role !== "admin") return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -45,6 +57,21 @@ export default function App() {
           }
         />
         <Route path="/verify" element={<VerifyPage />} />
+        
+        {/* Admin Routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="foods" element={<AdminFoodsPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
