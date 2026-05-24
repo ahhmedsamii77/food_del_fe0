@@ -22,24 +22,20 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      username: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
-      phone: "",
-      gender: "male",
     },
   });
 
   const onSubmit = (data: SignupFormData) => {
-    // Map username to name for the backend API
     const payload = {
-      name: data.username,
+      name: data.name,
       email: data.email,
       password: data.password,
     };
@@ -54,8 +50,6 @@ export default function RegisterPage() {
       },
     });
   };
-
-  const selectedGender = watch("gender");
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,oklch(97%_0.03_60),oklch(99%_0_0))]">
@@ -76,17 +70,17 @@ export default function RegisterPage() {
         <div className="rounded-2xl border border-border/60 bg-card shadow-xl shadow-black/5 p-7">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-            {/* Username */}
+            {/* Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="username" className="text-sm font-medium">Username</Label>
+              <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
               <Input
-                id="username"
-                placeholder="JohnDoe"
-                className={`h-11 rounded-xl ${errors.username ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                {...register("username")}
+                id="name"
+                placeholder="John Doe"
+                className={`h-11 rounded-xl ${errors.name ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                {...register("name")}
               />
-              {errors.username && (
-                <p className="text-xs text-destructive">{errors.username.message}</p>
+              {errors.name && (
+                <p className="text-xs text-destructive">{errors.name.message}</p>
               )}
             </div>
 
@@ -102,60 +96,6 @@ export default function RegisterPage() {
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email.message}</p>
-              )}
-            </div>
-
-            {/* Phone */}
-            <div className="space-y-1.5">
-              <Label htmlFor="phone" className="text-sm font-medium">Phone number</Label>
-              <Input
-                id="phone"
-                placeholder="+20 123 456 7890"
-                className={`h-11 rounded-xl ${errors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                {...register("phone")}
-              />
-              {errors.phone && (
-                <p className="text-xs text-destructive">{errors.phone.message}</p>
-              )}
-            </div>
-
-            {/* Gender */}
-            <div className="space-y-1.5">
-              <Label className="text-sm font-medium">Gender</Label>
-              <div className="grid grid-cols-2 gap-4">
-                <label
-                  className={`flex items-center justify-center gap-2 h-11 border rounded-xl cursor-pointer transition-all duration-200 ${
-                    selectedGender === "male"
-                      ? "border-primary bg-primary/5 text-primary font-semibold shadow-xs"
-                      : "border-border/60 text-muted-foreground hover:bg-accent hover:text-foreground"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value="male"
-                    className="sr-only"
-                    {...register("gender")}
-                  />
-                  <span>👨 Male</span>
-                </label>
-                <label
-                  className={`flex items-center justify-center gap-2 h-11 border rounded-xl cursor-pointer transition-all duration-200 ${
-                    selectedGender === "female"
-                      ? "border-primary bg-primary/5 text-primary font-semibold shadow-xs"
-                      : "border-border/60 text-muted-foreground hover:bg-accent hover:text-foreground"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value="female"
-                    className="sr-only"
-                    {...register("gender")}
-                  />
-                  <span>👩 Female</span>
-                </label>
-              </div>
-              {errors.gender && (
-                <p className="text-xs text-destructive">{errors.gender.message}</p>
               )}
             </div>
 

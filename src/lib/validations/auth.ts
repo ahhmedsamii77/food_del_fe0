@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export const signupSchema = z
   .object({
-    username: z
+    name: z
       .string()
-      .min(3, { message: "Username must be at least 3 characters" })
-      .max(20, { message: "Username must be at most 20 characters" })
-      .regex(/^[a-zA-Z ]+$/, { message: "Username must contain only letters" }),
+      .min(3, { message: "Name must be at least 3 characters" })
+      .max(50, { message: "Name must be at most 50 characters" })
+      .regex(/^[a-zA-Z ]+$/, { message: "Name must contain only letters" }),
     email: z.string().email({ message: "Invalid email" }),
     password: z
       .string()
@@ -14,12 +14,6 @@ export const signupSchema = z
     confirmPassword: z
       .string()
       .min(8, { message: "Password must be at least 8 characters" }),
-    phone: z.string().regex(/^\+?[0-9\s\-]{7,20}$/, {
-      message: "Invalid phone number",
-    }),
-    gender: z.enum(["male", "female"], {
-      message: "Invalid gender",
-    }),
   })
   .strict()
   .superRefine((data, ctx) => {
