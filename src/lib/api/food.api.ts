@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 
 const BASE = "/food";
-const IMAGES = import.meta.env.VITE_API_BASE_URL?.replace("/api", "") || "http://localhost:4000";
+const IMAGES = import.meta.env.VITE_API_BASE_URL?.replace("/api", "") 
 
 export const listFood = (signal?: AbortSignal) =>
   api.get(`${BASE}/list`, { signal });

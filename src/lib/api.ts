@@ -2,7 +2,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useAuthStore } from "@/lib/store/auth";
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api";
+const baseURL = import.meta.env.VITE_API_BASE_URL 
 
 export const api = axios.create({ baseURL });
 
@@ -35,8 +35,8 @@ async function refreshAccessToken(): Promise<string> {
 api.interceptors.request.use((config) => {
   const { access_Token } = useAuthStore.getState();
   if (access_Token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `${getPrefix(access_Token)} ${access_Token}`;
+    config.headers = (config.headers || {}) as any;
+    (config.headers as any).Authorization = `${getPrefix(access_Token)} ${access_Token}`;
   }
   return config;
 });
@@ -64,8 +64,8 @@ api.interceptors.response.use(
       const newToken = await refreshPromise;
       refreshPromise = null;
 
-      originalRequest.headers = originalRequest.headers || {};
-      originalRequest.headers.Authorization = `${getPrefix(newToken)} ${newToken}`;
+      originalRequest.headers = (originalRequest.headers || {}) as any;
+      (originalRequest.headers as any).Authorization = `${getPrefix(newToken)} ${newToken}`;
       delete originalRequest.signal;
       return api(originalRequest);
     } catch {
