@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useAdminGetAllOrders, useAdminUpdateOrderStatus } from "@/lib/hooks";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,9 +9,7 @@ import {
   User,
   Phone,
   MapPin,
-  CreditCard,
   Calendar,
-  Loader2,
   Filter,
 } from "lucide-react";
 import { toast } from "sonner";

@@ -7,7 +7,6 @@ import {
   ChefHat,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/lib/store/auth";
 import { useLogout } from "@/lib/hooks";
 import { toast } from "sonner";
 
@@ -19,7 +18,6 @@ const NAV = [
 
 export default function AdminLayout() {
   const navigate = useNavigate();
-  const { clearAuth } = useAuthStore();
   const { mutate: logoutMutate } = useLogout();
 
   const handleLogout = () => {
