@@ -244,7 +244,7 @@ export default function HomePage() {
       </section>
 
       {/* ════════════════ TESTIMONIALS ════════════════ */}
-      <section className="bg-gradient-to-br from-primary/5 to-orange-50 dark:from-primary/10 dark:to-background py-16">
+      <section className="bg-linear-to-br from-primary/5 to-orange-50 dark:from-primary/10 dark:to-background py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -285,7 +285,7 @@ export default function HomePage() {
 
       {/* ════════════════ CTA Banner ════════════════ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="rounded-3xl bg-gradient-to-r from-primary to-orange-400 p-10 text-center relative overflow-hidden">
+        <div className="rounded-3xl bg-linear-to-r from-primary to-orange-400 p-10 text-center relative overflow-hidden">
           <div aria-hidden className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
           <div aria-hidden className="pointer-events-none absolute bottom-0 left-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
           <h2 className="text-3xl font-extrabold text-white mb-3">Ready to order?</h2>

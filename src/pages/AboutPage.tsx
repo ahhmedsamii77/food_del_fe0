@@ -92,7 +92,7 @@ export default function AboutPage() {
           <div className="hidden md:block absolute top-16 left-1/4 right-1/4 h-0.5 bg-border z-0" />
           {STEPS.map((step, i) => (
             <div key={step.title} className="relative z-10 text-center animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
-              <div className={`inline-flex items-center justify-center h-24 w-24 rounded-3xl bg-gradient-to-br ${step.color} mb-5 mx-auto text-5xl shadow-sm border border-border/30`}>
+              <div className={`inline-flex items-center justify-center h-24 w-24 rounded-3xl bg-linear-to-br ${step.color} mb-5 mx-auto text-5xl shadow-sm border border-border/30`}>
                 {step.emoji}
               </div>
               <div className="absolute top-2 right-1/4 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
@@ -171,7 +171,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Contact ── */}
-      <section className="bg-gradient-to-br from-primary/5 to-orange-50 py-16">
+      <section className="bg-linear-to-br from-primary/5 to-orange-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-2 mb-2">

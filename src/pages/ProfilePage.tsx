@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  User as UserIcon,
+  
   Mail,
   Edit3,
   CheckCircle,
@@ -75,7 +75,7 @@ export default function ProfilePage() {
         <div className="lg:col-span-1">
           <div className="rounded-2xl border border-border/50 bg-card shadow-sm overflow-hidden animate-fade-in">
             {/* Avatar band */}
-            <div className="h-20 bg-gradient-to-br from-primary/80 to-orange-400" />
+            <div className="h-20 bg-linear-to-br from-primary/80 to-orange-400" />
             <div className="px-6 pb-6">
               <div className="-mt-8 mb-4">
                 <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center ring-4 ring-card shadow-lg">

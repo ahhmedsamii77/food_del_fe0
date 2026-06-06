@@ -77,7 +77,7 @@ export default function FoodDetailPage() {
 
   if (!food) {
     return (
-      <main className="max-w-5xl mx-auto px-4 py-10 text-center py-36">
+      <main className="max-w-5xl mx-auto px-4  text-center py-36">
         <span className="text-6xl">🍽️</span>
         <h2 className="text-2xl font-bold mt-4">Item not found</h2>
         <Button className="mt-6" onClick={() => navigate("/")}>Back to Menu</Button>
@@ -109,7 +109,7 @@ export default function FoodDetailPage() {
               e.currentTarget.style.display = "none";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
           <Badge className="absolute top-4 left-4 rounded-full bg-primary text-primary-foreground shadow-md">
             <Tag className="h-3 w-3 mr-1" />
             {food.category}
