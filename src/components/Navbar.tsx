@@ -9,8 +9,6 @@ import {
   X,
   User as UserIcon,
   Info,
-  Sun,
-  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,7 +22,7 @@ import {
 import { useAuthStore } from "@/lib/store/auth";
 import { useGetMe, useGetCart, useLogout } from "@/lib/hooks";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -33,28 +31,6 @@ export default function Navbar() {
   const { data: cartItems } = useGetCart();
   const { mutate: logoutMutate, isPending: isLoggingOut } = useLogout();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [dark, setDark] = useState(() =>
-    typeof window !== "undefined" && document.documentElement.classList.contains("dark")
-  );
-
-  useEffect(() => {
-    if (dark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [dark]);
-
-  // Apply saved theme on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      document.documentElement.classList.add("dark");
-      setDark(true);
-    }
-  }, []);
 
   const cartCount =
     cartItems?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
@@ -93,20 +69,20 @@ export default function Navbar() {
             <nav className="hidden md:flex items-center gap-1">
               <Link
                 to="/"
-                className="relative px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
               >
                 Menu
               </Link>
               <Link
                 to="/about"
-                className="relative px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
               >
                 About
               </Link>
               {access_Token && role !== "admin" && (
                 <Link
                   to="/orders"
-                  className="relative px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+                  className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
                 >
                   My Orders
                 </Link>
@@ -114,7 +90,7 @@ export default function Navbar() {
               {access_Token && role === "admin" && (
                 <Link
                   to="/admin"
-                  className="relative px-3 py-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors rounded-lg hover:bg-primary/5"
+                  className="px-3 py-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors rounded-lg hover:bg-primary/5"
                 >
                   Admin Panel
                 </Link>
@@ -123,18 +99,6 @@ export default function Navbar() {
 
             {/* ── Right actions ── */}
             <div className="flex items-center gap-2">
-              {/* Dark mode toggle */}
-              <Button
-                id="nav-dark-toggle"
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-full"
-                onClick={() => setDark((d) => !d)}
-                aria-label="Toggle dark mode"
-              >
-                {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-
               {/* Cart */}
               {access_Token && role !== "admin" && (
                 <Button
@@ -156,22 +120,22 @@ export default function Navbar() {
               {/* User dropdown or sign in */}
               {access_Token && user ? (
                 <DropdownMenu>
-                  <DropdownMenuTrigger
-                    render={
-                      <Button
-                        id="nav-user-menu"
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-full h-9 w-9 p-0"
-                      >
-                        <Avatar className="h-9 w-9 ring-2 ring-primary/20 ring-offset-1">
-                          <AvatarFallback className="bg-primary text-primary-foreground text-sm font-bold">
-                            {user.name?.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    }
-                  />
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      id="nav-user-menu"
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full h-9 w-9 p-0"
+                    >
+                      <Avatar className="h-9 w-9 ring-2 ring-primary/20 ring-offset-1">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-sm font-bold">
+                          {user.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  }
+                />
                   <DropdownMenuContent align="end" className="w-56 mt-1">
                     <div className="px-3 py-2.5 border-b border-border mb-1">
                       <p className="text-sm font-semibold">{user.name}</p>
