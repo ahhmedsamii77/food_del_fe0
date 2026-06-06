@@ -32,3 +32,9 @@ export const getMe = (signal?: AbortSignal) =>
 
 export const logout = () =>
   api.post(`${BASE}/logout`);
+
+export const updateProfile = (data: { name: string }) =>
+  api.put(`${BASE}/profile`, data);
+
+export const adminGetAllUsers = (signal?: AbortSignal) =>
+  api.get(`${BASE}/all`, { signal });

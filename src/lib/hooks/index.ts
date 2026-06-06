@@ -14,8 +14,10 @@ import {
   resetPassword,
   getMe,
   logout,
+  updateProfile,
+  adminGetAllUsers,
 } from "@/lib/api/user.api";
-import { listFood, addFood, removeFood } from "@/lib/api/food.api";
+import { listFood, addFood, removeFood, getFoodById } from "@/lib/api/food.api";
 import {
   addToCart,
   removeFromCart,
@@ -28,6 +30,7 @@ import {
   getUserOrders,
   adminGetAllOrders,
   adminUpdateOrderStatus,
+  getAnalytics,
 } from "@/lib/api/order.api";
 import { useAuthStore } from "@/lib/store/auth";
 import type {
@@ -224,5 +227,58 @@ export function useAdminUpdateOrderStatus() {
       adminUpdateOrderStatus(data),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] }),
+  });
+}
+
+// ── Food Detail ───────────────────────────────────────────────────────────────
+
+export function useGetFoodById(id: string): UseQueryResult<FoodItem> {
+  return useQuery({
+    queryKey: ["food", id],
+    queryFn: ({ signal }) => getFoodById(id, signal),
+    select: (data) => data.data.data as FoodItem,
+    enabled: !!id,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+// ── Profile ───────────────────────────────────────────────────────────────────
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string }) => updateProfile(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["me"] }),
+  });
+}
+
+// ── Admin: Users ──────────────────────────────────────────────────────────────
+
+export function useAdminGetAllUsers(): UseQueryResult<User[]> {
+  const { access_Token } = useAuthStore();
+  return useQuery({
+    queryKey: ["admin-users"],
+    queryFn: ({ signal }) => adminGetAllUsers(signal),
+    select: (data) => data.data.data as User[],
+    enabled: !!access_Token,
+  });
+}
+
+// ── Admin: Analytics ──────────────────────────────────────────────────────────
+
+export interface AnalyticsData {
+  revenueByDay: { date: string; revenue: number; count: number }[];
+  ordersByStatus: { status: string; count: number }[];
+  topItems: { name: string; quantity: number; revenue: number }[];
+}
+
+export function useGetAnalytics(): UseQueryResult<AnalyticsData> {
+  const { access_Token } = useAuthStore();
+  return useQuery({
+    queryKey: ["analytics"],
+    queryFn: ({ signal }) => getAnalytics(signal),
+    select: (data) => data.data.data as AnalyticsData,
+    enabled: !!access_Token,
+    staleTime: 1000 * 60 * 5,
   });
 }

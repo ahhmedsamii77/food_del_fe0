@@ -9,13 +9,19 @@ import ResetPasswordPage from "@/pages/auth/ResetPasswordPage";
 import CartPage from "@/pages/CartPage";
 import OrdersPage from "@/pages/OrdersPage";
 import VerifyPage from "@/pages/VerifyPage";
+import FoodDetailPage from "@/pages/FoodDetailPage";
+import ProfilePage from "@/pages/ProfilePage";
+import AboutPage from "@/pages/AboutPage";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 // Admin pages
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
 import AdminFoodsPage from "@/pages/admin/AdminFoodsPage";
 import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
+import AdminUsersPage from "@/pages/admin/AdminUsersPage";
+import AdminAnalyticsPage from "@/pages/admin/AdminAnalyticsPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { access_Token } = useAuthStore();
@@ -31,49 +37,43 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/auth/register" element={<RegisterPage />} />
-        <Route path="/auth/confirm-email" element={<ConfirmEmailPage />} />
-        <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <CartPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <OrdersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/verify" element={<VerifyPage />} />
-        
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
-          }
-        >
-          <Route index element={<AdminDashboardPage />} />
-          <Route path="foods" element={<AdminFoodsPage />} />
-          <Route path="orders" element={<AdminOrdersPage />} />
-        </Route>
+      <div className="flex-1">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/food/:id" element={<FoodDetailPage />} />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Auth */}
+          <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/register" element={<RegisterPage />} />
+          <Route path="/auth/confirm-email" element={<ConfirmEmailPage />} />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+
+          {/* Protected */}
+          <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/verify" element={<VerifyPage />} />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={<AdminRoute><AdminLayout /></AdminRoute>}
+          >
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="foods" element={<AdminFoodsPage />} />
+            <Route path="orders" element={<AdminOrdersPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="analytics" element={<AdminAnalyticsPage />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+      <Footer />
     </div>
   );
 }

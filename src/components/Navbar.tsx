@@ -7,6 +7,10 @@ import {
   LogIn,
   Menu as MenuIcon,
   X,
+  User as UserIcon,
+  Info,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -20,7 +24,7 @@ import {
 import { useAuthStore } from "@/lib/store/auth";
 import { useGetMe, useGetCart, useLogout } from "@/lib/hooks";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -29,6 +33,28 @@ export default function Navbar() {
   const { data: cartItems } = useGetCart();
   const { mutate: logoutMutate, isPending: isLoggingOut } = useLogout();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dark, setDark] = useState(() =>
+    typeof window !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    if (dark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [dark]);
+
+  // Apply saved theme on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+      setDark(true);
+    }
+  }, []);
 
   const cartCount =
     cartItems?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
@@ -71,6 +97,12 @@ export default function Navbar() {
               >
                 Menu
               </Link>
+              <Link
+                to="/about"
+                className="relative px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+              >
+                About
+              </Link>
               {access_Token && role !== "admin" && (
                 <Link
                   to="/orders"
@@ -91,6 +123,18 @@ export default function Navbar() {
 
             {/* ── Right actions ── */}
             <div className="flex items-center gap-2">
+              {/* Dark mode toggle */}
+              <Button
+                id="nav-dark-toggle"
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full"
+                onClick={() => setDark((d) => !d)}
+                aria-label="Toggle dark mode"
+              >
+                {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+
               {/* Cart */}
               {access_Token && role !== "admin" && (
                 <Button
@@ -146,6 +190,13 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     ) : (
                       <>
+                        <DropdownMenuItem
+                          id="nav-profile-link"
+                          onClick={() => navigate("/profile")}
+                        >
+                          <UserIcon className="mr-2 h-4 w-4" />
+                          My Profile
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           id="nav-orders-link"
                           onClick={() => navigate("/orders")}
@@ -216,14 +267,32 @@ export default function Navbar() {
             >
               Menu
             </Link>
+            <Link
+              to="/about"
+              className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+              onClick={() => setMobileOpen(false)}
+            >
+              <Info className="h-4 w-4" />
+              About
+            </Link>
             {access_Token && role !== "admin" && (
-              <Link
-                to="/orders"
-                className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                My Orders
-              </Link>
+              <>
+                <Link
+                  to="/profile"
+                  className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <UserIcon className="h-4 w-4" />
+                  My Profile
+                </Link>
+                <Link
+                  to="/orders"
+                  className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  My Orders
+                </Link>
+              </>
             )}
             {access_Token && role === "admin" && (
               <Link

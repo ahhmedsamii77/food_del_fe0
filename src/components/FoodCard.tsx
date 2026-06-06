@@ -43,7 +43,10 @@ export default function FoodCard({ food, cartItem }: FoodCardProps) {
   return (
     <article className="group flex flex-col rounded-2xl overflow-hidden border border-border/50 bg-card shadow-sm card-lift animate-fade-in">
       {/* ── Image ── */}
-      <div className="relative h-52 overflow-hidden bg-muted shrink-0">
+      <div
+        className="relative h-52 overflow-hidden bg-muted shrink-0 cursor-pointer"
+        onClick={() => navigate(`/food/${food._id}`)}
+      >
         {!imgError ? (
           <img
             src={getFoodImageUrl(food.image)}
@@ -74,7 +77,10 @@ export default function FoodCard({ food, cartItem }: FoodCardProps) {
       <div className="flex flex-col flex-1 p-4 gap-3">
         {/* Name + price */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-[15px] leading-snug line-clamp-1">
+          <h3
+            className="font-semibold text-[15px] leading-snug line-clamp-1 cursor-pointer hover:text-primary transition-colors"
+            onClick={() => navigate(`/food/${food._id}`)}
+          >
             {food.name}
           </h3>
           <span className="shrink-0 text-primary font-extrabold text-base">

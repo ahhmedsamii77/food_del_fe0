@@ -6,6 +6,9 @@ const IMAGES = import.meta.env.VITE_API_BASE_URL?.replace("/api", "")
 export const listFood = (signal?: AbortSignal) =>
   api.get(`${BASE}/list`, { signal });
 
+export const getFoodById = (id: string, signal?: AbortSignal) =>
+  api.get(`${BASE}/${id}`, { signal });
+
 export const addFood = (data: FormData) =>
   api.post(`${BASE}/add`, data, {
     headers: { "Content-Type": "multipart/form-data" },

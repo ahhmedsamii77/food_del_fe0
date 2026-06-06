@@ -5,15 +5,19 @@ import {
   ClipboardList,
   LogOut,
   ChefHat,
+  Users,
+  BarChart2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/lib/hooks";
 import { toast } from "sonner";
 
 const NAV = [
-  { to: "/admin",        label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/foods",  label: "Foods",     icon: UtensilsCrossed },
-  { to: "/admin/orders", label: "Orders",    icon: ClipboardList },
+  { to: "/admin",            label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/admin/foods",      label: "Foods",     icon: UtensilsCrossed },
+  { to: "/admin/orders",     label: "Orders",    icon: ClipboardList },
+  { to: "/admin/users",      label: "Users",     icon: Users },
+  { to: "/admin/analytics",  label: "Analytics", icon: BarChart2 },
 ];
 
 export default function AdminLayout() {
