@@ -159,7 +159,7 @@ export function useAddToCart() {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previousCart = queryClient.getQueryData<any>(["cart"]);
 
-      queryClient.setQueryData<any>(["cart"], (oldCart) => {
+      queryClient.setQueryData<any>(["cart"], (oldCart: any) => {
         if (!oldCart) return oldCart;
         
         const cartData = [...(oldCart.data.cartData || [])];
@@ -214,7 +214,7 @@ export function useRemoveFromCart() {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previousCart = queryClient.getQueryData<any>(["cart"]);
 
-      queryClient.setQueryData<any>(["cart"], (oldCart) => {
+      queryClient.setQueryData<any>(["cart"], (oldCart: any) => {
         if (!oldCart) return oldCart;
         
         let cartData = [...(oldCart.data.cartData || [])];
@@ -266,7 +266,7 @@ export function useUpdateCartQuantity() {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previousCart = queryClient.getQueryData<any>(["cart"]);
 
-      queryClient.setQueryData<any>(["cart"], (oldCart) => {
+      queryClient.setQueryData<any>(["cart"], (oldCart: any) => {
         if (!oldCart) return oldCart;
 
         let cartData = [...(oldCart.data.cartData || [])];
