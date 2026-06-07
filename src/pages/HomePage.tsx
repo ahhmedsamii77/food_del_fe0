@@ -19,12 +19,6 @@ const HOW_IT_WORKS = [
   { emoji: "🚀", step: "03", title: "Get Delivered", desc: "Pay securely and receive your hot meal in under 35 minutes." },
 ];
 
-const TESTIMONIALS = [
-  { name: "Sarah M.", avatar: "S", rating: 5, text: "The food arrives hot and fresh every single time. FoodDel is now my go-to for lunch!", role: "Regular Customer" },
-  { name: "Ahmed K.", avatar: "A", rating: 5, text: "Incredibly fast delivery and the portions are generous. Highly recommend the pasta!", role: "Food Enthusiast" },
-  { name: "Nour T.", avatar: "N", rating: 5, text: "Best food delivery app in Cairo. The interface is clean and ordering takes 30 seconds.", role: "Daily User" },
-];
-
 const CATEGORIES = [
   { emoji: "🍕", name: "Pizza" },
   { emoji: "🍔", name: "Burgers" },
@@ -243,45 +237,7 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ════════════════ TESTIMONIALS ════════════════ */}
-      <section className="bg-linear-to-br from-primary/5 to-orange-50 dark:from-primary/10 dark:to-background py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="h-1 w-6 rounded-full bg-primary" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary">Reviews</span>
-              <span className="h-1 w-6 rounded-full bg-primary" />
-            </div>
-            <h2 className="text-3xl font-bold">What our customers say</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map(({ name, avatar, rating, text, role }, i) => (
-              <div
-                key={name}
-                className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm card-lift animate-fade-in"
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                {/* Stars */}
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: rating }).map((_, s) => (
-                    <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5">"{text}"</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                  <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-primary-foreground">{avatar}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{name}</p>
-                    <p className="text-xs text-muted-foreground">{role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* ════════════════ CTA Banner ════════════════ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">

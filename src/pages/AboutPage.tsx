@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, MapPin, Phone, Mail, Zap, Shield, Heart } from "lucide-react";
+import { ChevronDown, ChevronUp, MapPin, Phone, Mail, Zap, Shield, Heart, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const STEPS = [
   {
@@ -26,6 +27,57 @@ const VALUES = [
   { icon: Zap, title: "Speed", desc: "Average delivery time under 35 minutes — we respect your hunger!", color: "bg-amber-50 text-amber-600" },
   { icon: Shield, title: "Quality", desc: "Every dish is prepared fresh daily with premium, locally sourced ingredients.", color: "bg-blue-50 text-blue-600" },
   { icon: Heart, title: "Care", desc: "We treat every order like it's for family — because you deserve the best.", color: "bg-rose-50 text-rose-600" },
+];
+
+const TESTIMONIALS = [
+  {
+    name: "Sarah M.",
+    avatar: "S",
+    rating: 5,
+    text: "The food arrives hot and fresh every single time. FoodDel is now my go-to for lunch!",
+    role: "Regular Customer",
+    location: "Cairo",
+  },
+  {
+    name: "Ahmed K.",
+    avatar: "A",
+    rating: 5,
+    text: "Incredibly fast delivery and the portions are generous. Highly recommend the pasta!",
+    role: "Food Enthusiast",
+    location: "Giza",
+  },
+  {
+    name: "Nour T.",
+    avatar: "N",
+    rating: 5,
+    text: "Best food delivery app in Cairo. The interface is clean and ordering takes 30 seconds.",
+    role: "Daily User",
+    location: "Heliopolis",
+  },
+  {
+    name: "Mariam R.",
+    avatar: "M",
+    rating: 5,
+    text: "I love how easy it is to track my order. The burgers are absolutely amazing!",
+    role: "Loyal Customer",
+    location: "Maadi",
+  },
+  {
+    name: "Omar S.",
+    avatar: "O",
+    rating: 5,
+    text: "Ordered for my whole office team — everyone was impressed by the quality and speed.",
+    role: "Corporate Client",
+    location: "New Cairo",
+  },
+  {
+    name: "Hana F.",
+    avatar: "H",
+    rating: 5,
+    text: "The salads are so fresh and the desserts are to die for. 10/10 would order again!",
+    role: "Health Conscious",
+    location: "Zamalek",
+  },
 ];
 
 const FAQS = [
@@ -131,6 +183,59 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ════════════════ TESTIMONIALS ════════════════ */}
+      <section className="bg-linear-to-br from-primary/5 to-orange-50 dark:from-primary/10 dark:to-background py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="h-1 w-6 rounded-full bg-primary" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-primary">Reviews</span>
+              <span className="h-1 w-6 rounded-full bg-primary" />
+            </div>
+            <h2 className="text-3xl font-bold">What our customers say</h2>
+            <p className="text-muted-foreground mt-2 text-sm">Over 10,000 happy customers and counting</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {TESTIMONIALS.map(({ name, avatar, rating, text, role, location }, i) => (
+              <div
+                key={name}
+                className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm card-lift animate-fade-in flex flex-col"
+                style={{ animationDelay: `${i * 0.08}s` }}
+              >
+                {/* Stars */}
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: rating }).map((_, s) => (
+                    <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">"{text}"</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+                  <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                    <span className="text-sm font-bold text-primary-foreground">{avatar}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{name}</p>
+                    <p className="text-xs text-muted-foreground">{role} · {location}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="mt-12 text-center">
+            <Link
+              to="/auth/register"
+              id="about-cta-btn"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all hover:shadow-primary/50 hover:shadow-xl active:scale-95"
+            >
+              🍽️&nbsp; Join thousands of happy customers
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ── */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
@@ -183,7 +288,7 @@ export default function AboutPage() {
             <p className="text-muted-foreground mt-2">We're here to help 7 days a week</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {[
               { icon: MapPin, label: "Address", value: "Cairo, Egypt", color: "bg-rose-50 text-rose-600" },
               { icon: Phone, label: "Phone", value: "+20 100 000 0000", color: "bg-emerald-50 text-emerald-600" },
