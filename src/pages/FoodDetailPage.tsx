@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ArrowLeft,
   ShoppingCart,
@@ -26,8 +26,8 @@ export default function FoodDetailPage() {
   const { data: food, isLoading } = useGetFoodById(id ?? "");
   const { data: allFoods } = useGetFoods();
   const { data: cartItems } = useGetCart();
-  const { mutate: addToCart } = useAddToCart();
-  const { mutate: updateQty } = useUpdateCartQuantity();
+  const { mutateAsync: addToCart, isPending: isAdding } = useAddToCart();
+  const { mutateAsync: updateQty } = useUpdateCartQuantity();
 
   const cartMap = useMemo(() => {
     const map: Record<string, import("@/types").CartItem> = {};
@@ -36,26 +36,50 @@ export default function FoodDetailPage() {
   }, [cartItems]);
 
   const cartItem = food ? cartMap[food._id] : undefined;
-  const qty = cartItem?.quantity ?? 0;
+  
+  const [qty, setQty] = useState(0);
+
+  useEffect(() => {
+    setQty(cartItem?.quantity ?? 0);
+  }, [cartItem?.quantity]);
 
   const related = useMemo(() => {
     if (!allFoods || !food) return [];
     return allFoods.filter((f) => f.category === food.category && f._id !== food._id).slice(0, 4);
   }, [allFoods, food]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!access_Token) return navigate("/auth/login");
     if (!food) return;
-    if (qty === 0) {
-      addToCart(food._id, { onError: () => toast.error("Failed to add to cart") });
-    } else {
-      updateQty({ itemId: food._id, quantity: qty + 1 }, { onError: () => toast.error("Failed to update cart") });
+
+    const prev = qty;
+    setQty((prevQty) => prevQty + 1);
+    try {
+      if (prev === 0) {
+        await addToCart(food._id);
+      } else {
+        await updateQty({ itemId: food._id, quantity: prev + 1 });
+      }
+      toast.success(`${food.name} added to cart!`);
+    } catch (error) {
+      setQty(prev);
+      toast.error("Failed to add to cart");
     }
   };
 
-  const handleDec = () => {
+  const handleDec = async () => {
     if (!food) return;
-    updateQty({ itemId: food._id, quantity: qty - 1 }, { onError: () => toast.error("Failed to update cart") });
+
+    const prev = qty;
+    if (prev <= 0) return;
+    setQty((prevQty) => Math.max(0, prevQty - 1));
+    try {
+      await updateQty({ itemId: food._id, quantity: prev - 1 });
+      toast.success(`${food.name} removed from cart!`);
+    } catch (error) {
+      setQty(prev);
+      toast.error("Failed to update cart");
+    }
   };
 
   if (isLoading) {
@@ -142,12 +166,13 @@ export default function FoodDetailPage() {
           {qty === 0 ? (
             <Button
               id={`detail-add-${food._id}`}
-              className="w-full sm:w-auto rounded-xl h-12 text-base gap-2 shadow-md shadow-primary/25"
+              className="w-full sm:w-auto rounded-xl h-12 text-base gap-2 shadow-md shadow-primary/25 cursor-pointer"
               size="lg"
               onClick={handleAdd}
+              disabled={isAdding}
             >
               <ShoppingCart className="h-5 w-5" />
-              Add to Cart
+              {isAdding ? "Adding…" : "Add to Cart"}
             </Button>
           ) : (
             <div className="flex items-center gap-3">
@@ -155,7 +180,7 @@ export default function FoodDetailPage() {
                 id={`detail-dec-${food._id}`}
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 rounded-xl"
+                className="h-11 w-11 rounded-xl cursor-pointer"
                 onClick={handleDec}
               >
                 <Minus className="h-4 w-4" />
@@ -165,7 +190,7 @@ export default function FoodDetailPage() {
                 id={`detail-inc-${food._id}`}
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 rounded-xl"
+                className="h-11 w-11 rounded-xl cursor-pointer"
                 onClick={handleAdd}
               >
                 <Plus className="h-4 w-4" />

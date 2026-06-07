@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Minus, ShoppingCart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,27 +17,42 @@ interface FoodCardProps {
 export default function FoodCard({ food, cartItem }: FoodCardProps) {
   const navigate = useNavigate();
   const { access_Token } = useAuthStore();
-  const { mutate: addToCart, isPending: isAdding } = useAddToCart();
-  const { mutate: removeFromCart, isPending: isRemoving } = useRemoveFromCart();
+  const { mutateAsync: addToCart, isPending: isAdding } = useAddToCart();
+  const { mutateAsync: removeFromCart } = useRemoveFromCart();
   const [imgError, setImgError] = useState(false);
 
-  const quantity = cartItem?.quantity ?? 0;
+  const [quantity, setQuantity] = useState(0);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    setQuantity(cartItem?.quantity ?? 0);
+  }, [cartItem?.quantity]);
+
+  const handleAdd = async () => {
     if (!access_Token) {
       toast.error("Please sign in to add items to cart");
       navigate("/auth/login");
       return;
     }
-    addToCart(food._id, {
-      onError: () => toast.error("Failed to add to cart"),
-    });
+
+    setQuantity((prev) => prev + 1);
+    try {
+      await addToCart(food._id);
+      toast.success(`${food.name} added to cart!`);
+    } catch (error) {
+      setQuantity((prev) => Math.max(0, prev - 1));
+      toast.error("Failed to add to cart");
+    }
   };
 
-  const handleRemove = () => {
-    removeFromCart(food._id, {
-      onError: () => toast.error("Failed to remove from cart"),
-    });
+  const handleRemove = async () => {
+    setQuantity((prev) => Math.max(0, prev - 1));
+    try {
+      await removeFromCart(food._id);
+      toast.success(`${food.name} removed from cart!`);
+    } catch (error) {
+      setQuantity((prev) => prev + 1);
+      toast.error("Failed to remove from cart");
+    }
   };
 
   return (
@@ -126,9 +141,8 @@ export default function FoodCard({ food, cartItem }: FoodCardProps) {
               id={`remove-${food._id}`}
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-xl border-border hover:border-primary/40 hover:bg-primary/5"
+              className="h-9 w-9 rounded-xl border-border hover:border-primary/40 hover:bg-primary/5 cursor-pointer"
               onClick={handleRemove}
-              disabled={isRemoving}
             >
               <Minus className="h-3.5 w-3.5" />
             </Button>
@@ -139,9 +153,8 @@ export default function FoodCard({ food, cartItem }: FoodCardProps) {
               id={`add-more-${food._id}`}
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-xl border-border hover:border-primary/40 hover:bg-primary/5"
+              className="h-9 w-9 rounded-xl border-border hover:border-primary/40 hover:bg-primary/5 cursor-pointer"
               onClick={handleAdd}
-              disabled={isAdding}
             >
               <Plus className="h-3.5 w-3.5" />
             </Button>
