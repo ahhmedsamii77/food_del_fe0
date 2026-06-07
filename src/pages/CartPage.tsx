@@ -124,11 +124,11 @@ export default function CartPage() {
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
-        <ShoppingCart className="h-7 w-7 text-primary" />
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 flex items-center gap-3">
+        <ShoppingCart className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
         Your Cart
-        <span className="ml-1 text-lg text-muted-foreground font-normal">
+        <span className="ml-1 text-base sm:text-lg text-muted-foreground font-normal">
           ({cartItems.length} item{cartItems.length > 1 ? "s" : ""})
         </span>
       </h1>
@@ -141,10 +141,10 @@ export default function CartPage() {
           {cartItems.map((item) => (
             <div
               key={item._id}
-              className="flex gap-4 items-center rounded-2xl border border-border/50 bg-card p-4 shadow-sm animate-fade-in"
+              className="flex flex-col xs:flex-row gap-3 sm:gap-4 items-start xs:items-center rounded-2xl border border-border/50 bg-card p-3 sm:p-4 shadow-sm animate-fade-in"
             >
               {/* Thumb */}
-              <div className="h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-muted">
+              <div className="h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl overflow-hidden bg-muted">
                 <img
                   src={getFoodImageUrl(item.image)}
                   alt={item.name}

@@ -85,17 +85,54 @@
     min-height: 100vh;
   }
 
-  /* Global cursor rules */
+  /* Global cursor rules — every interactive element shows pointer */
   a,
   button,
   select,
   summary,
+  label,
   [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="link"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="switch"],
+  [role="combobox"],
+  [tabindex]:not([tabindex="-1"]),
   input[type="submit"],
   input[type="button"],
+  input[type="reset"],
   input[type="checkbox"],
-  input[type="radio"] {
+  input[type="radio"],
+  input[type="file"],
+  input[type="range"],
+  input[type="color"],
+  textarea,
+  input:not([type="text"]):not([type="email"]):not([type="password"]):not([type="search"]):not([type="number"]):not([type="url"]):not([type="tel"]) {
     cursor: pointer;
+  }
+
+  /* Text inputs keep text cursor */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  input[type="url"],
+  input[type="tel"],
+  textarea {
+    cursor: text;
+  }
+
+  /* Disabled elements get not-allowed cursor */
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
   }
 
   /* Hide scrollbar but allow scrolling */

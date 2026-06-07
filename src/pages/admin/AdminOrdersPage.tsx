@@ -57,7 +57,7 @@ export default function AdminOrdersPage() {
   });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
       {/* ── Header ── */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Orders Management</h1>
@@ -149,7 +149,7 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {/* Status Update Control */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Status:
                   </span>
@@ -158,7 +158,7 @@ export default function AdminOrdersPage() {
                     value={order.status}
                     onChange={(e) => handleStatusChange(order._id, e.target.value)}
                     disabled={updateStatusMutation.isPending}
-                    className="h-9 rounded-xl border border-input bg-background px-3 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+                    className="h-9 rounded-xl border border-input bg-background px-3 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 cursor-pointer"
                   >
                     {STATUS_OPTIONS.map((status) => (
                       <option key={status} value={status}>
@@ -170,7 +170,7 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Order Info Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-5">
                 {/* 1. Items List */}
                 <div className="space-y-3">
                   <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
