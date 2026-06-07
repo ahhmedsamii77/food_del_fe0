@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   ShoppingCart,
   UtensilsCrossed,
@@ -26,6 +26,7 @@ import { useState } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { access_Token, role } = useAuthStore();
   const { data: user } = useGetMe();
   const { data: cartItems } = useGetCart();
@@ -69,20 +70,32 @@ export default function Navbar() {
             <nav className="hidden md:flex items-center gap-1">
               <Link
                 to="/"
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg cursor-pointer ${
+                  pathname === "/"
+                    ? "text-primary bg-primary/8 font-semibold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
               >
                 Menu
               </Link>
               <Link
                 to="/about"
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg cursor-pointer ${
+                  pathname === "/about"
+                    ? "text-primary bg-primary/8 font-semibold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
               >
                 About
               </Link>
               {access_Token && role !== "admin" && (
                 <Link
                   to="/orders"
-                  className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg cursor-pointer ${
+                    pathname === "/orders"
+                      ? "text-primary bg-primary/8 font-semibold shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
                 >
                   My Orders
                 </Link>
@@ -90,7 +103,11 @@ export default function Navbar() {
               {access_Token && role === "admin" && (
                 <Link
                   to="/admin"
-                  className="px-3 py-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors rounded-lg hover:bg-primary/5"
+                  className={`px-3 py-2 text-sm font-semibold transition-colors rounded-lg cursor-pointer ${
+                    pathname.startsWith("/admin")
+                      ? "text-primary bg-primary/10 shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
                 >
                   Admin Panel
                 </Link>
@@ -226,14 +243,22 @@ export default function Navbar() {
           <nav className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-1">
             <Link
               to="/"
-              className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
+              className={`px-3 py-2.5 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
+                pathname === "/"
+                  ? "text-primary bg-primary/8 font-semibold shadow-xs"
+                  : "hover:bg-accent text-muted-foreground hover:text-foreground"
+              }`}
               onClick={() => setMobileOpen(false)}
             >
               Menu
             </Link>
             <Link
               to="/about"
-              className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+              className={`px-3 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
+                pathname === "/about"
+                  ? "text-primary bg-primary/8 font-semibold shadow-xs"
+                  : "hover:bg-accent text-muted-foreground hover:text-foreground"
+              }`}
               onClick={() => setMobileOpen(false)}
             >
               <Info className="h-4 w-4" />
@@ -243,7 +268,11 @@ export default function Navbar() {
               <>
                 <Link
                   to="/profile"
-                  className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+                  className={`px-3 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
+                    pathname === "/profile"
+                      ? "text-primary bg-primary/8 font-semibold shadow-xs"
+                      : "hover:bg-accent text-muted-foreground hover:text-foreground"
+                  }`}
                   onClick={() => setMobileOpen(false)}
                 >
                   <UserIcon className="h-4 w-4" />
@@ -251,7 +280,11 @@ export default function Navbar() {
                 </Link>
                 <Link
                   to="/orders"
-                  className="px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
+                  className={`px-3 py-2.5 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
+                    pathname === "/orders"
+                      ? "text-primary bg-primary/8 font-semibold shadow-xs"
+                      : "hover:bg-accent text-muted-foreground hover:text-foreground"
+                  }`}
                   onClick={() => setMobileOpen(false)}
                 >
                   My Orders
@@ -261,7 +294,11 @@ export default function Navbar() {
             {access_Token && role === "admin" && (
               <Link
                 to="/admin"
-                className="px-3 py-2.5 text-sm font-semibold rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                className={`px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
+                  pathname.startsWith("/admin")
+                    ? "bg-primary/10 text-primary font-bold"
+                    : "hover:bg-accent text-muted-foreground hover:text-foreground"
+                }`}
                 onClick={() => setMobileOpen(false)}
               >
                 Admin Panel
