@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Flame, Clock, Star, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import FoodCard, { FoodCardSkeleton } from "@/components/FoodCard";
 import CategoryFilter from "@/components/CategoryFilter";
+import ProductsPagination from "@/components/ProductsPagination";
 import { useGetFoods, useGetCart } from "@/lib/hooks";
 import { useNavigate } from "react-router-dom";
 
@@ -32,9 +33,16 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const limit = 8;
 
   const { data: foods, isLoading: foodsLoading } = useGetFoods();
   const { data: cartItems } = useGetCart();
+
+  // Reset page when category or search query changes
+  useEffect(() => {
+    setPage(1);
+  }, [category, search]);
 
   const cartMap = useMemo(() => {
     const map: Record<string, import("@/types").CartItem> = {};
@@ -50,6 +58,13 @@ export default function HomePage() {
       return matchCat && matchSearch;
     });
   }, [foods, category, search]);
+
+  const totalPages = Math.ceil(filtered.length / limit);
+
+  const paginatedFoods = useMemo(() => {
+    const start = (page - 1) * limit;
+    return filtered.slice(start, start + limit);
+  }, [filtered, page, limit]);
 
   return (
     <main>
@@ -229,11 +244,18 @@ export default function HomePage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {filtered.map((food) => (
-              <FoodCard key={food._id} food={food} cartItem={cartMap[food._id]} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {paginatedFoods.map((food) => (
+                <FoodCard key={food._id} food={food} cartItem={cartMap[food._id]} />
+              ))}
+            </div>
+            <ProductsPagination
+              currentPage={page}
+              totalPages={totalPages}
+              setPage={setPage}
+            />
+          </>
         )}
       </section>
 

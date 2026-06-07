@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "@/lib/store/auth";
 import HomePage from "@/pages/HomePage";
@@ -25,13 +26,55 @@ import AdminAnalyticsPage from "@/pages/admin/AdminAnalyticsPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { access_Token } = useAuthStore();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   if (!access_Token) return <Navigate to="/auth/login" replace />;
   return <>{children}</>;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { access_Token, role } = useAuthStore();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   if (!access_Token || role !== "admin") return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
+function GuestRoute({ children }: { children: React.ReactNode }) {
+  const { access_Token } = useAuthStore();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) return null;
+
+  if (access_Token) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -46,11 +89,11 @@ export default function App() {
           <Route path="/food/:id" element={<FoodDetailPage />} />
 
           {/* Auth */}
-          <Route path="/auth/login" element={<LoginPage />} />
-          <Route path="/auth/register" element={<RegisterPage />} />
+          <Route path="/auth/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+          <Route path="/auth/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
           <Route path="/auth/confirm-email" element={<ConfirmEmailPage />} />
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/auth/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
+          <Route path="/auth/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
 
           {/* Protected */}
           <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
