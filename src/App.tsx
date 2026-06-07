@@ -113,6 +113,8 @@ export default function App() {
             <Route path="analytics" element={<AdminAnalyticsPage />} />
           </Route>
 
+
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
